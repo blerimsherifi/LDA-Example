@@ -45,7 +45,9 @@ namespace ConsoleApp1
             //};
 
             // location of the file wich contains input data
-            var samples = ReadDataFromFile(@"C:\Users\bleri\Downloads\MasterThesis\input_sentences_restaurants.csv");
+            var inputDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "input_sentences_restaurants.csv");
+
+            var samples = ReadDataFromFile(inputDataPath);
 
             // Convert training data to IDataView.
             var dataview = mlContext.Data.LoadFromEnumerable(samples);
@@ -64,6 +66,7 @@ namespace ConsoleApp1
                 .Append(mlContext.Transforms.Text.ProduceNgrams("Tokens"))
                 .Append(mlContext.Transforms.Text.LatentDirichletAllocation(
                     "Features", "Tokens", numberOfTopics: 3));
+            
 
             // Fit to data.
             var transformer = pipeline.Fit(dataview);
@@ -71,10 +74,15 @@ namespace ConsoleApp1
             // Create the prediction engine to get the LDA features extracted from
             // the text.
             var predictionEngine = mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(transformer);
-
+            
             // Convert the sample text into LDA features and print it.
-            foreach(var itm in samples)
-                PrintLdaFeatures(predictionEngine.Predict(itm));
+            int i = 0; 
+            foreach (var itm in samples)
+            {
+                i++;
+                if(i < 50)
+                 PrintLdaFeatures(predictionEngine.Predict(itm));
+            }
 
             // Features obtained post-transformation.
             // For LatentDirichletAllocation, we had specified numTopic:3. Hence
@@ -84,6 +92,9 @@ namespace ConsoleApp1
             //  Topic1  Topic2  Topic3
             //  0.6364  0.2727  0.0909
             //  0.5455  0.1818  0.2727
+
+            SaveModel(mlContext, dataview.Schema, transformer);
+
         }
 
         private static void PrintLdaFeatures(TransformedTextData prediction)
@@ -122,5 +133,17 @@ namespace ConsoleApp1
         {
             public float[] Features { get; set; }
         }
+
+        public static void SaveModel(MLContext mlContext, DataViewSchema trainingDataViewSchema, ITransformer model)
+        {
+            // Save the trained model to .zip file
+            // <SnippetSaveModel>
+            var modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "RestaurantsModel.zip");
+
+            Console.WriteLine("=============== Saving the model to a file ===============");
+            mlContext.Model.Save(model, trainingDataViewSchema, modelPath);
+            // </SnippetSaveModel>
+        }
+
     }
 }
