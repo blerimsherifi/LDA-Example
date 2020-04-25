@@ -47,7 +47,7 @@ namespace NFMSample
         {
             // Load training & test datasets using datapaths
             // <SnippetLoadData>
-            var trainingDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "recommendation-ratings-train.csv");
+            var trainingDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "Restaurant_comments_ALB.csv");
             var testDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "recommendation-ratings-test.csv");
 
             IDataView trainingDataView = mlContext.Data.LoadFromTextFile<MovieRating>(trainingDataPath, hasHeader: true, separatorChar: ',');
@@ -62,8 +62,7 @@ namespace NFMSample
         {
             // Add data transformations
             // <SnippetDataTransformations>
-            IEstimator<ITransformer> estimator = mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "userIdEncoded", inputColumnName: "userId")
-                .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "movieIdEncoded", inputColumnName: "movieId"));
+            IEstimator<ITransformer> estimator = mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "userIdEncoded", inputColumnName: "userId");
             // </SnippetDataTransformations>
 
             // Set algorithm options and append algorithm
@@ -71,7 +70,7 @@ namespace NFMSample
             var options = new MatrixFactorizationTrainer.Options
             {
                 MatrixColumnIndexColumnName = "userIdEncoded",
-                MatrixRowIndexColumnName = "movieIdEncoded",
+                MatrixRowIndexColumnName = "userIdEncoded",
                 LabelColumnName = "Label",
                 NumberOfIterations = 20,
                 ApproximationRank = 100

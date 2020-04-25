@@ -13,8 +13,6 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
             LatentDirichletAllocation.Example();
         }
     }
@@ -45,7 +43,7 @@ namespace ConsoleApp1
             //};
 
             // location of the file wich contains input data
-            var inputDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "input_sentences_restaurants.csv");
+            var inputDataPath = Path.Combine(Environment.CurrentDirectory, "Data", "Restaurant_comments_ALB.csv");
 
             var samples = ReadDataFromFile(inputDataPath);
 
@@ -114,7 +112,7 @@ namespace ConsoleApp1
                 CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture);
                 config.Delimiter = ";";
                 var parsedCsv = new CsvParser(reader, config);
-
+                parsedCsv.Configuration.BadDataFound = null;
                 string[] row = null;
                 while ((row = parsedCsv.Read()) != null)
                 {
